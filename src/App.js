@@ -8,8 +8,29 @@ import axios from 'axios';
 
 function App() {
 
-  let [news_data] = useState(data);
+  let [newsdata, setNewsData] = useState(data);
+  let [query, setQuery] = useState('');
   let navigate = useNavigate();
+
+  const handleSearch = async () => {
+    const clientID = 'eLFtCBjwNEgrrufyiyF_';
+    const clientSecret = '9b1HjJJgx4';
+
+    try {
+      const response = await axios.get('/v1/search/news.json', {
+        params: { query: query },
+        headers: {
+          'X-Naver-Client-Id': clientID,
+          'X-Naver-Client-Secret': clientSecret,
+        },
+      });
+      console.log('성공', response.data.items);
+      setNewsData(response.data.items);
+    }
+    catch (error) {
+      console.log('실패', error);
+    }
+  };
 
   return (
     <div className="App">
@@ -33,20 +54,34 @@ function App() {
         </Container>
       </Navbar>
 
+      <div className="search-container">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="검색어를 입력하세요"
+        />
+        <button onClick={handleSearch}>검색</button>
+      </div>
+
       <Routes>
         <Route path="/" element={<div>
           <div className="container">
             <div className='row'>
               {
-                news_data.map((a, i) => {
-                  return (
-                    <Card news_data={news_data[i]}></Card>
-                  )
-                })
+                newsdata && newsdata.length > 0 ? (
+                  newsdata.map((a, i) => {
+                    return (
+                      <Card key={i} title={a.title}></Card>
+                    )
+                  })
+                ) : (
+                  <div>데이터가 없습니다.</div>
+                )
               }
             </div>
           </div></div>} />
-        <Route path="/detail/:id" element={<Detail news_data={news_data} />} />
+        <Route path="/detail/:id" element={<Detail newsdata={newsdata} />} />
         <Route path="*" element={<div>Not Found</div>} />
       </Routes>
     </div>
@@ -58,10 +93,9 @@ function Card(props) {
 
   return (
     <div className='col-md-4'>
-      <h4 onClick={() => navigate(`/detail/${props.news_data.id}`)} style={{ cursor: 'pointer' }}>
-        {props.news_data.title}
+      <h4 onClick={() => navigate(`/detail/${props.newsdata.id}`)} style={{ cursor: 'pointer' }}>
+        {props.title}
       </h4>
-      <p>{props.news_data.content}</p>
     </div>
   );
 }
