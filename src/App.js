@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import { Navbar, Container, Nav, Row, Col } from 'react-bootstrap';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
+import Collapse from 'react-bootstrap/Collapse';
 import Card from 'react-bootstrap/Card';
 import Pagination from 'react-bootstrap/Pagination';
 import data from './pages/data.js';
 import Detail from './pages/Detail.js';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
-import Button from 'react-bootstrap/Button';
-import Collapse from 'react-bootstrap/Collapse';
+import axios from 'axios';
 
 function App() {
-  let [newsdata] = useState(data);
+  let [newsdata, setNewsData] = useState(data);
   let [selectedTopic, setSelectedTopic] = useState(null);
   let [currentPage, setCurrentPage] = useState(1);
   let [openStates, setOpenStates] = useState({});
@@ -43,6 +44,20 @@ function App() {
   const handlePageChange = (page) => {
     setCurrentPage(page);
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://springboot-developer-env.eba-zqkfw5p2.ap-northeast-2.elasticbeanstalk.com/');
+        console.log('성공', response.data);
+        setNewsData(response.data);
+      }
+      catch (error) {
+        console.error('실패', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="App">
