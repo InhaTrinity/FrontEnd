@@ -53,7 +53,7 @@ function App() {
         setNewsData(response.data);
       }
       catch (error) {
-        console.error('실패', error);
+        console.error('실패?', error);
       }
     };
     fetchData();
