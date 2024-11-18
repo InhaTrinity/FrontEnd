@@ -1,19 +1,17 @@
-import { useEffect, useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
-import { Navbar, Container, Nav, Row, Col } from 'react-bootstrap';
+import { Navbar, Container, Nav, Row, Col, Card, Form, Button, Collapse, Spinner } from 'react-bootstrap';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
-import Spinner from 'react-bootstrap/Spinner';
-import Button from 'react-bootstrap/Button';
-import Collapse from 'react-bootstrap/Collapse';
-import Card from 'react-bootstrap/Card';
+import axios from 'axios';
 import data from './pages/data.js';
 import Detail from './pages/Detail.js';
-import axios from 'axios';
 
 function App() {
   let [newsdata, setNewsData] = useState(data);
   let [selectedTopic, setSelectedTopic] = useState(null);
   let [openStates, setOpenStates] = useState({});
+  let [searchQuery, setSearchQuery] = useState('');
+  let [searchInput, setSearchInput] = useState('');
   let [itemsToShow, setItemsToShow] = useState(10);
   let [loading, setLoading] = useState(false);
   let navigate = useNavigate();
@@ -26,7 +24,10 @@ function App() {
 
   const handleMainClick = () => {
     setSelectedTopic(null);
+    setSearchQuery('');
+    setSearchInput('');
     setItemsToShow(10); // 메인으로 돌아갈 때 초기화
+    navigate('/');
   }
 
   const handleToggle = (id) => {
@@ -36,8 +37,17 @@ function App() {
     }));
   }
 
+  const handleSearch = () => {
+    setLoading(true);
+    setSearchQuery(searchInput);
+  }
+
   const filteredNewsData = selectedTopic ? newsdata.filter(item => item.topic === selectedTopic) : newsdata;
-  const currentData = filteredNewsData.slice(0, itemsToShow);
+  const searchedNewsData = searchQuery ? filteredNewsData.filter(item => item.title === searchQuery) : filteredNewsData;
+  const currentData = searchedNewsData.slice(0, itemsToShow);
+
+  console.log('검색어:', searchQuery);
+  console.log('필터링된 데이터:', searchedNewsData);
 
   const topics = [...new Set(data.map(item => item.topic))];
 
@@ -49,6 +59,7 @@ function App() {
     const fetchData = async () => {
       setLoading(true);
       try {
+        await new Promise(resolve => setTimeout(resolve, 5000));
         const response = await axios.get('http://springboot-developer-env.eba-zqkfw5p2.ap-northeast-2.elasticbeanstalk.com/');
         console.log('성공', response.data);
         setNewsData(response.data);
@@ -79,6 +90,12 @@ function App() {
     };
   }, [loader]);
 
+  useEffect(() => {
+    if (loading) {
+      setLoading(false);
+    }
+  }, [searchedNewsData]);
+
   return (
     <div className="App">
       <Navbar collapseOnSelect expand="lg" data-bs-theme="dark" bg="dark" className="bg-body-tertiary">
@@ -94,9 +111,28 @@ function App() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
+
+      <Container className="my-3">
+        {!loading && (
+          <Form className="d-flex">
+            <Form.Group controlId="search" className="flex-grow-1">
+              <Form.Control
+                type="text"
+                placeholder="검색어를 입력하세요"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+            </Form.Group>
+            <Button variant="primary" onClick={handleSearch} className="ms-2">검색하기</Button>
+          </Form>
+        )}
+      </Container>
+
       {loading ? (
-        <Container className="d-flex justify-content-center my-5">
-          <Spinner animation="border" role="status"></Spinner>
+        <Container className="text-center my-5">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
         </Container>
       ) : (
         <Routes>
@@ -134,7 +170,7 @@ function App() {
             </div>
           } />
           <Route path="/detail/:id" element={<Detail newsdata={newsdata} />} />
-          <Route path="*" element={<h1>Not Found</h1>} />
+          <Route path="*" element={<div>Not Found</div>} />
         </Routes>
       )}
     </div>
