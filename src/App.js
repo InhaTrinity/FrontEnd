@@ -46,9 +46,6 @@ function App() {
   const searchedNewsData = searchQuery ? filteredNewsData.filter(item => item.title === searchQuery) : filteredNewsData;
   const currentData = searchedNewsData.slice(0, itemsToShow);
 
-  console.log('검색어:', searchQuery);
-  console.log('필터링된 데이터:', searchedNewsData);
-
   const topics = [...new Set(data.map(item => item.topic))];
 
   const loadMore = () => {
@@ -59,7 +56,6 @@ function App() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        await new Promise(resolve => setTimeout(resolve, 5000));
         const response = await axios.get('http://springboot-developer-env.eba-zqkfw5p2.ap-northeast-2.elasticbeanstalk.com/');
         console.log('성공', response.data);
         setNewsData(response.data);
