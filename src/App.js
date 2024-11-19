@@ -56,7 +56,7 @@ function App() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://springboot-developer-env.eba-zqkfw5p2.ap-northeast-2.elasticbeanstalk.com/');
+        const response = await axios.get(process.env.REACT_APP_BACKEND_URL);
         console.log('성공', response.data);
         setNewsData(response.data);
       }
