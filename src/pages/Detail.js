@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
-import data from './data.js';
 import { useEffect } from "react";
 
 function Detail({ newsdata, darkMode }) {
