@@ -153,7 +153,7 @@ function App() {
                 <Row xs={1} md={2} className="g-4">
                   {currentData.map((item, index) => (
                     <Col key={index}>
-                      <Card>
+                      <Card className = "shadow-sm mb-4">
                         <Card.Img variant="top" src={item.image} style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '0 auto' }} />
                         <Card.Body>
                           <Card.Title onClick={() => { navigate(`/detail/${item.id}`) }} style={{ cursor: 'pointer' }}>{item.title}</Card.Title>
