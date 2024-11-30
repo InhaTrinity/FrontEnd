@@ -14,6 +14,8 @@ function App() {
   let [searchInput, setSearchInput] = useState('');
   let [itemsToShow, setItemsToShow] = useState(10);
   let [loading, setLoading] = useState(false);
+  let [darkMode, setDarkMode] = useState(false);
+
   let navigate = useNavigate();
   const loader = useRef(null);
 
@@ -42,9 +44,13 @@ function App() {
     setSearchQuery(searchInput);
   }
 
+  const handleDarkModeToggle = () => {
+    setDarkMode(!darkMode);
+  }
+
   const filteredNewsData = selectedTopic ? newsdata.filter(item => item.topic === selectedTopic) : newsdata;
   const searchedNewsData = searchQuery ? filteredNewsData.filter(item => item.title === searchQuery) : filteredNewsData;
-  const currentData = searchedNewsData.slice(0, itemsToShow);
+  const currentData = filteredNewsData.slice(0, itemsToShow);
 
   const topics = [...new Set(data.map(item => item.topic))];
 
@@ -59,9 +65,10 @@ function App() {
         const response = await axios.get(process.env.REACT_APP_BACKEND_URL);
         console.log('성공', response.data);
         setNewsData(response.data);
+        setItemsToShow(10);
       }
       catch (error) {
-        console.error('실패?', error);
+        console.error('실패', error);
       }
       setLoading(false);
     };
@@ -70,7 +77,7 @@ function App() {
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
+      if (entries[0].isIntersecting && !loading) {
         loadMore();
       }
     }, { threshold: 1.0 });
@@ -93,7 +100,7 @@ function App() {
   }, [searchedNewsData]);
 
   return (
-    <div className="App">
+    <div className={`App ${darkMode ? 'dark-mode' : ''}`}>
       <Navbar collapseOnSelect expand="lg" data-bs-theme="dark" bg="dark" className="bg-body-tertiary">
         <Container>
           <Navbar.Brand as={Link} to="/" onClick={handleMainClick}>뉴스 및 여론 요약 서비스</Navbar.Brand>
@@ -103,6 +110,7 @@ function App() {
               {topics.map((topic, index) => (
                 <Nav.Link key={index} onClick={() => handleTopicClick(topic)}>{topic}</Nav.Link>
               ))}
+              <Nav.Link onClick={handleDarkModeToggle}>{darkMode ? '라이트 모드' : '다크 모드'}</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
