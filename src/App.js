@@ -14,7 +14,10 @@ function App() {
   let [searchInput, setSearchInput] = useState(''); // 검색어 입력
   let [itemsToShow, setItemsToShow] = useState(10); // 보여줄 아이템 수, 초기값은 10
   let [loading, setLoading] = useState(false); // 로딩 상태
-  let [darkMode, setDarkMode] = useState(false); // 다크 모드
+  let [darkMode, setDarkMode] = useState(() => {
+    const saveDarkMode = localStorage.getItem('darkMode'); // 로컬 스토리지에서 다크 모드 상태를 가져옴
+    return saveDarkMode ? JSON.parse(saveDarkMode) : false; // 다크 모드 상태가 있으면 가져오고, 없으면 false로 설정
+  }); // 다크 모드
 
   let navigate = useNavigate(); // 라우터 네비게이션을 위한 변수
   const loader = useRef(null); // 무한 스크롤을 위한 로더
@@ -45,7 +48,11 @@ function App() {
   }
 
   const handleDarkModeToggle = () => {
-    setDarkMode(!darkMode); // 다크 모드를 토글
+    setDarkMode(prevMode => { // 다크 모드를 토글
+      const newMode = !prevMode; // 이전 모드의 반대로 변경
+      localStorage.setItem('darkMode', JSON.stringify(newMode)); // 다크 모드 상태를 로컬 스토리지에 저장
+      return newMode; // 변경된 모드를 반환
+    });
   }
 
   const filteredNewsData = selectedTopic ? newsdata.filter(item => item.topic === selectedTopic) : newsdata;
