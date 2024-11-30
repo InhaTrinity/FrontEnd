@@ -190,7 +190,7 @@ function App() {
               </Container>
             </div>
           } />
-          <Route path="/detail/:id" element={<Detail newsdata={newsdata} />} />
+          <Route path="/detail/:id" element={<Detail newsdata={newsdata} darkMode={darkMode}/>} />
           <Route path="*" element={<div>Not Found</div>} />
         </Routes>
       )}
