@@ -115,7 +115,6 @@ function App() {
               {topics.map((topic, index) => (
                 <Nav.Link key={index} onClick={() => handleTopicClick(topic)}>{topic}</Nav.Link>
               ))}
-              <Nav.Link onClick={handleDarkModeToggle}>{darkMode ? '라이트 모드' : '다크 모드'}</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -133,6 +132,9 @@ function App() {
               />
             </Form.Group>
             <Button variant="primary" onClick={handleSearch} className="ms-2">검색하기</Button>
+            <Button variant={darkMode ? "light" : "dark"} onClick={handleDarkModeToggle} className="ms-2">
+              {darkMode ? "라이트 모드" : "다크 모드"}
+            </Button>
           </Form>
         )}
       </Container>
