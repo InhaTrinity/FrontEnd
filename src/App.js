@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import './App.css';
-import { Navbar, Container, Nav, Row, Col, Card, Form, Button, Collapse, Spinner } from 'react-bootstrap';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { Container, Row, Spinner } from 'react-bootstrap';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import data from './pages/data.js';
 import Detail from './pages/Detail.js';
+import NavBar from './components/Navbar.js';
+import NewsCard from './components/NewsCard.js';
+import SearchBar from './components/Searchbar.js';
 
 function App() {
   let [newsdata, setNewsData] = useState(data); // 기본값으로 data.js를 사용
@@ -94,7 +97,7 @@ function App() {
           loadMore(); // 더 많은 데이터를 로드
         }
       },
-      { threshold: 1.0 } 
+      { threshold: 1.0 }
     );
 
     if (loader.current) { // 로더가 있으면
@@ -116,36 +119,17 @@ function App() {
 
   return (
     <div className={`App ${darkMode ? 'dark-mode' : ''}`}>
-      <Navbar collapseOnSelect expand="lg" data-bs-theme="dark" bg="dark" className="bg-body-tertiary">
-        <Container>
-          <Navbar.Brand as={Link} to="/" onClick={handleMainClick}>뉴스 및 여론 요약 서비스</Navbar.Brand>
-          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-          <Navbar.Collapse id="responsive-navbar-nav">
-            <Nav className="ms-auto">
-              {topics.map((topic, index) => (
-                <Nav.Link key={index} onClick={() => handleTopicClick(topic)}>{topic}</Nav.Link>
-              ))}
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+      <NavBar topics={topics} handleTopicClick={handleTopicClick} handleMainClick={handleMainClick} />
 
       <Container className="my-3">
         {!loading && (
-          <Form className="d-flex">
-            <Form.Group controlId="search" className="flex-grow-1">
-              <Form.Control
-                type="text"
-                placeholder="검색어를 입력하세요"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
-            </Form.Group>
-            <Button variant="primary" onClick={handleSearch} className="ms-2">검색하기</Button>
-            <Button variant={darkMode ? "light" : "dark"} onClick={handleDarkModeToggle} className="ms-2">
-              {darkMode ? "라이트 모드" : "다크 모드"}
-            </Button>
-          </Form>
+          <SearchBar
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
+            handleSearch={handleSearch}
+            darkMode={darkMode}
+            handleDarkModeToggle={handleDarkModeToggle}
+          />
         )}
       </Container>
 
@@ -162,35 +146,14 @@ function App() {
               <Container>
                 <Row xs={1} md={2} className="g-4">
                   {currentData.map((item, index) => (
-                    <Col key={index}>
-                      <Card className = "shadow-sm mb-4">
-                        <Card.Img variant="top" src={item.image} style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '0 auto' }} />
-                        <Card.Body>
-                          <Card.Title onClick={() => { navigate(`/detail/${item.id}`) }} style={{ cursor: 'pointer' }}>{item.title}</Card.Title>
-                          <Card.Text>
-                            {item.content}
-                            <br />
-                            <Button onClick={() => handleToggle(item.id)}
-                              aria-controls={`example-collapse-text-${item.id}`}
-                              aria-expanded={openStates[item.id]}>
-                              의견보기
-                            </Button>
-                            <Collapse in={openStates[item.id]}>
-                              <div id={`example-collapse-text-${item.id}`}>
-                                {item.opinion}
-                              </div>
-                            </Collapse>
-                          </Card.Text>
-                        </Card.Body>
-                      </Card>
-                    </Col>
+                    <NewsCard key={index} item={item} openStates={openStates} handleToggle={handleToggle} />
                   ))}
                 </Row>
                 <div ref={loader} />
               </Container>
             </div>
           } />
-          <Route path="/detail/:id" element={<Detail newsdata={newsdata} darkMode={darkMode}/>} />
+          <Route path="/detail/:id" element={<Detail newsdata={newsdata} darkMode={darkMode} />} />
           <Route path="*" element={<div>Not Found</div>} />
         </Routes>
       )}
