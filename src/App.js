@@ -115,7 +115,6 @@ function App() {
               {topics.map((topic, index) => (
                 <Nav.Link key={index} onClick={() => handleTopicClick(topic)}>{topic}</Nav.Link>
               ))}
-              <Nav.Link onClick={handleDarkModeToggle}>{darkMode ? '라이트 모드' : '다크 모드'}</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -133,6 +132,9 @@ function App() {
               />
             </Form.Group>
             <Button variant="primary" onClick={handleSearch} className="ms-2">검색하기</Button>
+            <Button variant={darkMode ? "light" : "dark"} onClick={handleDarkModeToggle} className="ms-2">
+              {darkMode ? "라이트 모드" : "다크 모드"}
+            </Button>
           </Form>
         )}
       </Container>
@@ -151,7 +153,7 @@ function App() {
                 <Row xs={1} md={2} className="g-4">
                   {currentData.map((item, index) => (
                     <Col key={index}>
-                      <Card>
+                      <Card className = "shadow-sm mb-4">
                         <Card.Img variant="top" src={item.image} style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '0 auto' }} />
                         <Card.Body>
                           <Card.Title onClick={() => { navigate(`/detail/${item.id}`) }} style={{ cursor: 'pointer' }}>{item.title}</Card.Title>

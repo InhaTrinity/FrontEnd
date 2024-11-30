@@ -10,7 +10,7 @@ function Detail() {
 
     return (
         <div className="d-flex justify-content-around">
-            <Card style={{ width: '70%' }}>
+            <Card className = "shadow-sm" style={{ width: '70%' }}>
                 <Card.Img variant="top" src={item.image} alt="no image" 
                 style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '0 auto' }}/>
                 <Card.Body>
