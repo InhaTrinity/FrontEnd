@@ -76,11 +76,16 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && !loading) {
-        loadMore();
-      }
-    }, { threshold: 1.0 });
+    if (!newsdata.length || loading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading) {
+          loadMore(); // 더 많은 데이터를 로드
+        }
+      },
+      { threshold: 1.0 }
+    );
 
     if (loader.current) {
       observer.observe(loader.current);
@@ -91,7 +96,7 @@ function App() {
         observer.unobserve(loader.current);
       }
     };
-  }, [loader]);
+  }, [loader, itemsToShow, newsdata, loading]);
 
   useEffect(() => {
     if (loading) {
