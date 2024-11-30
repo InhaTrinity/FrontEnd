@@ -2,6 +2,36 @@
   text-align: center;
 }
 
+.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.dark-mode .navbar {
+  background-color: #1f1f1f;
+}
+
+.dark-mode .card {
+  background-color: #1f1f1f;
+  color: #ffffff;
+}
+
+.dark-mode .form-control {
+  background-color: #333333;
+  color: #ffffff;
+  border: 1px solid #444444;
+}
+
+.dark-mode .btn-primary {
+  background-color: #333333;
+  border: 1px solid #444444;
+}
+
+.dark-mode .btn-outline-primary {
+  color: #ffffff;
+  border: 1px solid #444444;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
