@@ -2,11 +2,19 @@ import { useParams } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import data from './data.js';
+import { useEffect } from "react";
 
 function Detail() {
 
     let { id } = useParams();
     let item = data[id];
+
+    useEffect(() => {
+        document.body.classList.add('dark-mode');
+        return () => {
+            document.body.classList.remove('dark-mode');
+        }
+    }, []);
 
     return (
         <div className="d-flex justify-content-around">
