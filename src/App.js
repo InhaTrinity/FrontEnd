@@ -3,14 +3,13 @@ import './App.css';
 import { Container, Row, Spinner } from 'react-bootstrap';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import data from './pages/data.js';
 import Detail from './pages/Detail.js';
 import NavBar from './components/Navbar.js';
 import NewsCard from './components/NewsCard.js';
 import SearchBar from './components/Searchbar.js';
 
 function App() {
-  let [newsdata, setNewsData] = useState(data); // 기본값으로 data.js를 사용
+  let [newsdata, setNewsData] = useState([]); // 뉴스 데이터
   let [selectedTopic, setSelectedTopic] = useState(null); // 선택된 주제
   let [openStates, setOpenStates] = useState({}); // 각 아이템의 펼침 상태
   let [searchQuery, setSearchQuery] = useState(''); // 검색어
@@ -65,7 +64,7 @@ function App() {
   const currentData = filteredNewsData.slice(0, itemsToShow);
   // 자른 데이터의 주제 목록을 만듦
 
-  const topics = [...new Set(data.map(item => item.topic))]; // 중복되지 않는 주제 목록을 만듦
+  const topics = [...new Set(newsdata.map(item => item.topic))]; // 중복되지 않는 주제 목록을 만듦
 
   const loadMore = () => {
     setItemsToShow(prev => prev + 10); // 보여줄 아이템 수를 10개씩 더 보여줌
