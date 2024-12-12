@@ -45,6 +45,10 @@ function App() {
   }
 
   const handleSearch = () => {
+    if (searchInput.trim() === '') {
+      setSearchQuery(''); // 검색어가 없으면 검색어 초기화
+      return; // 검색어가 없으면 실행하지 않음
+    }
     setLoading(true); // 검색 중에는 로딩 상태를 true로 변경
     setSearchQuery(searchInput); // 검색어를 입력하면 해당 검색어가 포함된 뉴스만 보여줌
   }
@@ -59,9 +63,9 @@ function App() {
 
   const filteredNewsData = selectedTopic ? newsdata.filter(item => item.topic === selectedTopic) : newsdata;
   // 검색어가 포함된 뉴스만 보여줌
-  const searchedNewsData = searchQuery ? filteredNewsData.filter(item => item.title === searchQuery) : filteredNewsData;
+  const searchedNewsData = searchQuery ? filteredNewsData.filter(item => item.title.includes(searchQuery)) : filteredNewsData;
   // 보여줄 아이템 수만큼 데이터를 자름
-  const currentData = filteredNewsData.slice(0, itemsToShow);
+  const currentData = searchedNewsData.slice(0, itemsToShow);
   // 자른 데이터의 주제 목록을 만듦
 
   const topics = [...new Set(newsdata.map(item => item.topic))]; // 중복되지 않는 주제 목록을 만듦
@@ -144,9 +148,13 @@ function App() {
             <div>
               <Container>
                 <Row xs={1} md={2} className="g-4">
-                  {currentData.map((item, index) => (
-                    <NewsCard key={index} item={item} openStates={openStates} handleToggle={handleToggle} />
-                  ))}
+                  {currentData.length > 0 ? (
+                    currentData.map((item, index) => (
+                      <NewsCard key={index} item={item} openStates={openStates} handleToggle={handleToggle} />
+                    ))
+                  ) : (
+                    <div className="text-center w-100">검색결과가 없습니다</div>
+                  )}
                 </Row>
                 <div ref={loader} />
               </Container>
