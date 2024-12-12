@@ -18,6 +18,23 @@ function Detail({ newsdata, darkMode }) {
         }
     }, [darkMode]);
 
+    const handleShare = () => {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url).then(() => {
+            alert('URL이 복사되었습니다.');
+        }).catch((err) => {
+            alert('URL 복사에 실패했습니다.');
+        });
+    }
+
+    if (!item) {
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
+                <h1>뉴스를 찾을 수 없습니다.</h1>
+            </div>
+        )
+    }
+
     return (
         <div className="d-flex justify-content-around">
             <Card className="shadow-sm" style={{ width: '70%' }}>
@@ -31,6 +48,7 @@ function Detail({ newsdata, darkMode }) {
                         {item.opinion}
                     </Card.Text>
                     <Button variant="primary" href={item.link} target="_blank">원문 보기</Button>
+                    <Button variant="secondary" onClick={handleShare} className="ms-2">공유하기</Button>
                 </Card.Body>
             </Card>
         </div>
