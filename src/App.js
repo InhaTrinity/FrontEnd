@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { Container, Row, Spinner } from 'react-bootstrap';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Detail from './pages/Detail.js';
 import NavBar from './components/Navbar.js';
@@ -24,6 +24,7 @@ function App() {
 
   let navigate = useNavigate(); // 라우터 네비게이션을 위한 변수
   const loader = useRef(null); // 무한 스크롤을 위한 로더
+  const location = useLocation(); // 현재 경로를 가져오기 위한 변수
 
   const handleTopicClick = (topic) => {
     setSelectedTopic(topic); // 주제를 선택하면 해당 주제의 뉴스만 보여줌
@@ -126,7 +127,7 @@ function App() {
       <NavBar topics={topics} handleTopicClick={handleTopicClick} handleMainClick={handleMainClick} />
 
       <Container className="my-3">
-        {!loading && (
+        {!loading && !(location.pathname.includes('/detail')) && (
           <SearchBar
             searchInput={searchInput}
             setSearchInput={setSearchInput}
