@@ -7,6 +7,7 @@ import Detail from './pages/Detail.js';
 import NavBar from './components/Navbar.js';
 import NewsCard from './components/NewsCard.js';
 import SearchBar from './components/Searchbar.js';
+import Bookmark from './pages/Bookmarks.js';
 
 function App() {
   let [newsdata, setNewsData] = useState([]); // 뉴스 데이터
@@ -161,6 +162,7 @@ function App() {
             </div>
           } />
           <Route path="/detail/:id" element={<Detail newsdata={newsdata} darkMode={darkMode} />} />
+          <Route path="/bookmarks" element={<Bookmark darkMode={darkMode} />} />
           <Route path="*" element={<div>Not Found</div>} />
         </Routes>
       )}
