@@ -1,8 +1,7 @@
-// NewsCard.js
+//NewsCard.js
 import { React, useState } from 'react';
 import { Card, Button, Collapse, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-
 
 function NewsCard({ item, openStates, handleToggle }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -13,12 +12,14 @@ function NewsCard({ item, openStates, handleToggle }) {
   };
 
   return (
-    <Col>
-      <Card className="shadow-sm mb-4" style={{ width: '600px', height: isExpanded ? 'auto' : '310px', overflow: 'hidden' }}>
-        <Card.Img variant="top" src={item.image} style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '0 auto' }} />
-        <Card.Body>
+    <Col xs={12} md={6} className="mb-4">
+      <Card className="shadow-sm" style={{ height: '100%' }}>
+        {item.image && (
+          <Card.Img variant="top" src={item.image} style={{ width: '100%', height: 'auto', maxHeight: '200px', objectFit: 'contain' }} />
+        )}
+        <Card.Body className="d-flex flex-column justify-content-center align-items-center text-center">
           <Card.Title onClick={() => { navigate(`/detail/${item.id}`) }} style={{ cursor: 'pointer' }}>{item.title}</Card.Title>
-          <Card.Text style={{ maxHeight: isExpanded ? 'none' : '200px', overflow: isExpanded ? 'visible' : 'hidden' }}>
+          <Card.Text>
             {isExpanded || item.content.length <= 150 ? item.content : `${item.content.substring(0, 130)}...`}
             <br />
             {item.content.length > 130 && (
