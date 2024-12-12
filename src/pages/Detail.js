@@ -1,11 +1,15 @@
 import { useParams } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
+import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
 
 function Detail({ newsdata, darkMode }) {
     let { id } = useParams();
     let item = newsdata.find(item => item.id === parseInt(id));
+    const [isBookmarked, setIsBookmarked] = useState(false);
 
     useEffect(() => {
         if (darkMode) {
@@ -18,6 +22,11 @@ function Detail({ newsdata, darkMode }) {
         }
     }, [darkMode]);
 
+    useEffect(() => {
+        const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+        setIsBookmarked(bookmarks.some(bookmark => bookmark.id === item.id));
+    }, [item.id]);
+
     const handleShare = () => {
         const url = window.location.href;
         navigator.clipboard.writeText(url).then(() => {
@@ -25,6 +34,19 @@ function Detail({ newsdata, darkMode }) {
         }).catch((err) => {
             alert('URL 복사에 실패했습니다.');
         });
+    }
+
+    const handleBookmark = () => {
+        const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+        if (isBookmarked) {
+            const updatedBookmarks = bookmarks.filter(bookmark => bookmark.id !== item.id);
+            localStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
+            setIsBookmarked(false);
+        } else {
+            bookmarks.push(item);
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            setIsBookmarked(true);
+        }
     }
 
     if (!item) {
@@ -49,6 +71,9 @@ function Detail({ newsdata, darkMode }) {
                     </Card.Text>
                     <Button variant="primary" href={item.link} target="_blank">원문 보기</Button>
                     <Button variant="secondary" onClick={handleShare} className="ms-2">공유하기</Button>
+                    <Button variant="link" onClick={handleBookmark} className="ms-2">
+                        <FontAwesomeIcon icon={isBookmarked ? solidStar : regularStar} size="2x" />
+                    </Button>
                 </Card.Body>
             </Card>
         </div>
