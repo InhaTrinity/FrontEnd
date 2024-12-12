@@ -14,6 +14,7 @@ function NavBar({ topics, handleTopicClick, handleMainClick }) {
             {topics.map((topic, index) => (
               <Nav.Link key={index} onClick={() => handleTopicClick(topic)}>{topic}</Nav.Link>
             ))}
+            <Nav.Link as={Link} to="/bookmarks">북마크</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
