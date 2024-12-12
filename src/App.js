@@ -1,141 +1,138 @@
 import { useState, useEffect, useRef } from 'react';
 import './App.css';
-import { Navbar, Container, Nav, Row, Col, Card, Form, Button, Collapse, Spinner } from 'react-bootstrap';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { Container, Row, Spinner } from 'react-bootstrap';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import data from './pages/data.js';
 import Detail from './pages/Detail.js';
+import NavBar from './components/Navbar.js';
+import NewsCard from './components/NewsCard.js';
+import SearchBar from './components/Searchbar.js';
 
 function App() {
-  let [newsdata, setNewsData] = useState(data);
-  let [selectedTopic, setSelectedTopic] = useState(null);
-  let [openStates, setOpenStates] = useState({});
-  let [searchQuery, setSearchQuery] = useState('');
-  let [searchInput, setSearchInput] = useState('');
-  let [itemsToShow, setItemsToShow] = useState(10);
-  let [loading, setLoading] = useState(false);
-  let [darkMode, setDarkMode] = useState(false);
+  let [newsdata, setNewsData] = useState([]); // 뉴스 데이터
+  let [selectedTopic, setSelectedTopic] = useState(null); // 선택된 주제
+  let [openStates, setOpenStates] = useState({}); // 각 아이템의 펼침 상태
+  let [searchQuery, setSearchQuery] = useState(''); // 검색어
+  let [searchInput, setSearchInput] = useState(''); // 검색어 입력
+  let [itemsToShow, setItemsToShow] = useState(10); // 보여줄 아이템 수, 초기값은 10
+  let [loading, setLoading] = useState(false); // 로딩 상태
+  let [darkMode, setDarkMode] = useState(() => {
+    const saveDarkMode = localStorage.getItem('darkMode'); // 로컬 스토리지에서 다크 모드 상태를 가져옴
+    return saveDarkMode ? JSON.parse(saveDarkMode) : false; // 다크 모드 상태가 있으면 가져오고, 없으면 false로 설정
+  }); // 다크 모드
 
-  let navigate = useNavigate();
-  const loader = useRef(null);
+  let navigate = useNavigate(); // 라우터 네비게이션을 위한 변수
+  const loader = useRef(null); // 무한 스크롤을 위한 로더
 
   const handleTopicClick = (topic) => {
-    setSelectedTopic(topic);
+    setSelectedTopic(topic); // 주제를 선택하면 해당 주제의 뉴스만 보여줌
     setItemsToShow(10); // 주제를 변경할 때 초기화
   }
 
   const handleMainClick = () => {
-    setSelectedTopic(null);
-    setSearchQuery('');
-    setSearchInput('');
+    setSelectedTopic(null); // 메인으로 돌아가면 모든 뉴스를 보여줌
+    setSearchQuery(''); // 메인으로 돌아가면 검색어 초기화
+    setSearchInput(''); // 메인으로 돌아가면 검색어 입력 초기화
     setItemsToShow(10); // 메인으로 돌아갈 때 초기화
     navigate('/');
   }
 
   const handleToggle = (id) => {
-    setOpenStates(prevState => ({
-      ...prevState,
-      [id]: !prevState[id]
+    setOpenStates(prevState => ({ // 펼침 상태를 토글
+      ...prevState, // 기존 상태를 복사
+      [id]: !prevState[id] // 해당 아이템의 펼침 상태를 반전
     }));
   }
 
   const handleSearch = () => {
-    setLoading(true);
-    setSearchQuery(searchInput);
+    if (searchInput.trim() === '') {
+      setSearchQuery(''); // 검색어가 없으면 검색어 초기화
+      return; // 검색어가 없으면 실행하지 않음
+    }
+    setLoading(true); // 검색 중에는 로딩 상태를 true로 변경
+    setSearchQuery(searchInput); // 검색어를 입력하면 해당 검색어가 포함된 뉴스만 보여줌
   }
 
   const handleDarkModeToggle = () => {
-    setDarkMode(!darkMode);
+    setDarkMode(prevMode => { // 다크 모드를 토글
+      const newMode = !prevMode; // 이전 모드의 반대로 변경
+      localStorage.setItem('darkMode', JSON.stringify(newMode)); // 다크 모드 상태를 로컬 스토리지에 저장
+      return newMode; // 변경된 모드를 반환
+    });
   }
 
   const filteredNewsData = selectedTopic ? newsdata.filter(item => item.topic === selectedTopic) : newsdata;
-  const searchedNewsData = searchQuery ? filteredNewsData.filter(item => item.title === searchQuery) : filteredNewsData;
-  const currentData = filteredNewsData.slice(0, itemsToShow);
+  // 검색어가 포함된 뉴스만 보여줌
+  const searchedNewsData = searchQuery ? filteredNewsData.filter(item => item.title.includes(searchQuery)) : filteredNewsData;
+  // 보여줄 아이템 수만큼 데이터를 자름
+  const currentData = searchedNewsData.slice(0, itemsToShow);
+  // 자른 데이터의 주제 목록을 만듦
 
-  const topics = [...new Set(data.map(item => item.topic))];
+  const topics = [...new Set(newsdata.map(item => item.topic))]; // 중복되지 않는 주제 목록을 만듦
 
   const loadMore = () => {
-    setItemsToShow(prev => prev + 10);
+    setItemsToShow(prev => prev + 10); // 보여줄 아이템 수를 10개씩 더 보여줌
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    const fetchData = async () => { // 백엔드에서 데이터를 가져옴
+      setLoading(true); // 데이터를 가져올 때 로딩 상태를 true로 변경
       try {
-        const response = await axios.get(process.env.REACT_APP_BACKEND_URL);
-        console.log('성공', response.data);
-        setNewsData(response.data);
-        setItemsToShow(10);
+        const response = await axios.get(process.env.REACT_APP_BACKEND_URL); // 백엔드 서버 주소
+        console.log('성공', response.data); // 데이터를 가져오면 콘솔에 출력, 확인용 코드
+        setNewsData(response.data); // 가져온 데이터를 newsdata에 저장
+        setItemsToShow(10); // 데이터를 가져오면 보여줄 아이템 수를 초기화
       }
       catch (error) {
-        console.error('실패', error);
+        console.error('실패', error); // 데이터를 가져오지 못하면 콘솔에 출력, 확인용 코드
       }
-      setLoading(false);
+      setLoading(false); // 데이터를 가져오면 로딩 상태를 false로 변경
     };
-    fetchData();
+    fetchData(); // 데이터를 가져오는 함수를 실행
   }, []);
 
   useEffect(() => {
-    if (!newsdata.length || loading) return;
+    if (!newsdata.length || loading) return; // 뉴스 데이터가 없거나 로딩 중이면 실행하지 않음
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !loading) {
+    const observer = new IntersectionObserver( // 무한 스크롤을 위한 옵저버
+      (entries) => { // 엔트리가 보이면
+        if (entries[0].isIntersecting && !loading) { // 로딩 중이 아니면
           loadMore(); // 더 많은 데이터를 로드
         }
       },
       { threshold: 1.0 }
     );
 
-    if (loader.current) {
-      observer.observe(loader.current);
+    if (loader.current) { // 로더가 있으면
+      observer.observe(loader.current); // 로더를 관찰
     }
 
-    return () => {
-      if (loader.current) {
-        observer.unobserve(loader.current);
+    return () => { // 컴포넌트가 언마운트되면 로더 관찰을 중지
+      if (loader.current) { // 로더가 있으면
+        observer.unobserve(loader.current); // 로더 관찰을 중지
       }
     };
-  }, [loader, itemsToShow, newsdata, loading]);
+  }, [loader, itemsToShow, newsdata, loading]); // 로더, 보여줄 아이템 수, 뉴스 데이터, 로딩 상태가 변경될 때마다 실행
 
   useEffect(() => {
-    if (loading) {
-      setLoading(false);
+    if (loading) { // 로딩 중이면
+      setLoading(false); // 로딩 상태를 false로 변경
     }
-  }, [searchedNewsData]);
+  }, [searchedNewsData]); // 검색된 뉴스 데이터가 변경될 때마다 실행
 
   return (
     <div className={`App ${darkMode ? 'dark-mode' : ''}`}>
-      <Navbar collapseOnSelect expand="lg" data-bs-theme="dark" bg="dark" className="bg-body-tertiary">
-        <Container>
-          <Navbar.Brand as={Link} to="/" onClick={handleMainClick}>뉴스 및 여론 요약 서비스</Navbar.Brand>
-          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-          <Navbar.Collapse id="responsive-navbar-nav">
-            <Nav className="ms-auto">
-              {topics.map((topic, index) => (
-                <Nav.Link key={index} onClick={() => handleTopicClick(topic)}>{topic}</Nav.Link>
-              ))}
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+      <NavBar topics={topics} handleTopicClick={handleTopicClick} handleMainClick={handleMainClick} />
 
       <Container className="my-3">
         {!loading && (
-          <Form className="d-flex">
-            <Form.Group controlId="search" className="flex-grow-1">
-              <Form.Control
-                type="text"
-                placeholder="검색어를 입력하세요"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
-            </Form.Group>
-            <Button variant="primary" onClick={handleSearch} className="ms-2">검색하기</Button>
-            <Button variant={darkMode ? "light" : "dark"} onClick={handleDarkModeToggle} className="ms-2">
-              {darkMode ? "라이트 모드" : "다크 모드"}
-            </Button>
-          </Form>
+          <SearchBar
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
+            handleSearch={handleSearch}
+            darkMode={darkMode}
+            handleDarkModeToggle={handleDarkModeToggle}
+          />
         )}
       </Container>
 
@@ -151,36 +148,19 @@ function App() {
             <div>
               <Container>
                 <Row xs={1} md={2} className="g-4">
-                  {currentData.map((item, index) => (
-                    <Col key={index}>
-                      <Card className = "shadow-sm mb-4">
-                        <Card.Img variant="top" src={item.image} style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '0 auto' }} />
-                        <Card.Body>
-                          <Card.Title onClick={() => { navigate(`/detail/${item.id}`) }} style={{ cursor: 'pointer' }}>{item.title}</Card.Title>
-                          <Card.Text>
-                            {item.content}
-                            <br />
-                            <Button onClick={() => handleToggle(item.id)}
-                              aria-controls={`example-collapse-text-${item.id}`}
-                              aria-expanded={openStates[item.id]}>
-                              의견보기
-                            </Button>
-                            <Collapse in={openStates[item.id]}>
-                              <div id={`example-collapse-text-${item.id}`}>
-                                {item.opinion}
-                              </div>
-                            </Collapse>
-                          </Card.Text>
-                        </Card.Body>
-                      </Card>
-                    </Col>
-                  ))}
+                  {currentData.length > 0 ? (
+                    currentData.map((item, index) => (
+                      <NewsCard key={index} item={item} openStates={openStates} handleToggle={handleToggle} />
+                    ))
+                  ) : (
+                    <div className="text-center w-100">검색결과가 없습니다</div>
+                  )}
                 </Row>
                 <div ref={loader} />
               </Container>
             </div>
           } />
-          <Route path="/detail/:id" element={<Detail newsdata={newsdata} />} />
+          <Route path="/detail/:id" element={<Detail newsdata={newsdata} darkMode={darkMode} />} />
           <Route path="*" element={<div>Not Found</div>} />
         </Routes>
       )}
