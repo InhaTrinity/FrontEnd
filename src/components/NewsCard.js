@@ -1,6 +1,6 @@
 //NewsCard.js
 import { React, useState } from 'react';
-import { Card, Button, Collapse, Col } from 'react-bootstrap';
+import { Card, Button, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 function NewsCard({ item, openStates, handleToggle }) {
@@ -24,7 +24,7 @@ function NewsCard({ item, openStates, handleToggle }) {
             <br />
             {item.content.length > 130 && (
               <Button variant="link" onClick={toggleExpand}>
-                {isExpanded ? '접기' : '펼쳐보기'}
+                {isExpanded ? '접기' : '자세히 보기'}
               </Button>
             )}
           </Card.Text>
