@@ -84,7 +84,7 @@ function Detail({ newsdata, darkMode }) {
                     <Card.Title>{item.title}</Card.Title>
                     <Card.Text>
                         {item.content}
-                        <br></br>
+                        <div style={{ width: '100%', height: '1px', backgroundColor: '#ccc', margin: '10px 0' }}></div>
                         {item.opinion}
                     </Card.Text>
                     <Button variant="secondary" onClick={() => navigate(-1)} className="me-2">
