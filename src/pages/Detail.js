@@ -8,7 +8,7 @@ import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
 
 function Detail({ newsdata, darkMode }) {
     let { id } = useParams();
-    let item = newsdata.find(item => item.id === parseInt(id));
+    const [item, setItem] = useState(null);
     const [isBookmarked, setIsBookmarked] = useState(false);
 
     useEffect(() => {
@@ -23,9 +23,17 @@ function Detail({ newsdata, darkMode }) {
     }, [darkMode]);
 
     useEffect(() => {
+        if (newsdata && newsdata.length > 0) {
+            const foundItem = newsdata.find(news => news.id === parseInt(id));
+            setItem(foundItem);
+        }
+    }, [newsdata, id]);
+
+    useEffect(() => {
+        if (!item) return;
         const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
         setIsBookmarked(bookmarks.some(bookmark => bookmark.id === item.id));
-    }, [item.id]);
+    }, [item]);
 
     const handleShare = () => {
         const url = window.location.href;
@@ -52,7 +60,7 @@ function Detail({ newsdata, darkMode }) {
     if (!item) {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
-                <h1>뉴스를 찾을 수 없습니다.</h1>
+                <h1>로딩중...</h1>
             </div>
         )
     }
