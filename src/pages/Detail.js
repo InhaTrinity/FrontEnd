@@ -1,15 +1,20 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import '../App.css';
 
 function Detail({ newsdata, darkMode }) {
     let { id } = useParams();
+    let navigate = useNavigate();
     const [item, setItem] = useState(null);
     const [isBookmarked, setIsBookmarked] = useState(false);
+    const [popupAnimation, setPopupAnimation] = useState('');
+    const [popupMessage, setPopupMessage] = useState('');
 
     useEffect(() => {
         if (darkMode) {
@@ -38,9 +43,13 @@ function Detail({ newsdata, darkMode }) {
     const handleShare = () => {
         const url = window.location.href;
         navigator.clipboard.writeText(url).then(() => {
-            alert('URL이 복사되었습니다.');
-        }).catch((err) => {
-            alert('URL 복사에 실패했습니다.');
+            setPopupMessage('URL이 복사되었습니다!');
+            setPopupAnimation('popup-show');
+            setTimeout(() => setPopupAnimation('popup-hide'), 2500);
+        }).catch(() => {
+            setPopupMessage('URL 복사에 실패했습니다.');
+            setPopupAnimation('popup-show');
+            setTimeout(() => setPopupAnimation('popup-hide'), 2500);
         });
     }
 
@@ -67,9 +76,10 @@ function Detail({ newsdata, darkMode }) {
 
     return (
         <div className="d-flex justify-content-around">
+            <div className={`popup ${popupAnimation}`}>{popupMessage}</div>
             <Card className="shadow-sm" style={{ width: '70%' }}>
-                <Card.Img variant="top" src={item.image} alt="no image" 
-                style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '0 auto' }}/>
+                <Card.Img variant="top" src={item.image} alt="no image"
+                    style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '0 auto' }} />
                 <Card.Body>
                     <Card.Title>{item.title}</Card.Title>
                     <Card.Text>
@@ -77,6 +87,9 @@ function Detail({ newsdata, darkMode }) {
                         <br></br>
                         {item.opinion}
                     </Card.Text>
+                    <Button variant="secondary" onClick={() => navigate(-1)} className="me-2">
+                        <FontAwesomeIcon icon={faArrowLeft} /> 뒤로 가기
+                    </Button>
                     <Button variant="primary" href={item.link} target="_blank">원문 보기</Button>
                     <Button variant="secondary" onClick={handleShare} className="ms-2">공유하기</Button>
                     <Button variant="link" onClick={handleBookmark} className="ms-2">
