@@ -1,15 +1,10 @@
 //NewsCard.js
-import { React, useState } from 'react';
+import { React } from 'react';
 import { Card, Button, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
-function NewsCard({ item, openStates, handleToggle }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+function NewsCard({ item }) {
   let navigate = useNavigate();
-
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
-  };
 
   return (
     <Col xs={12} md={6} className="mb-4">
@@ -19,15 +14,8 @@ function NewsCard({ item, openStates, handleToggle }) {
         )}
         <Card.Body className="d-flex flex-column justify-content-center align-items-center text-center">
           <Card.Title onClick={() => { navigate(`/detail/${item.id}`) }} style={{ cursor: 'pointer' }}>{item.title}</Card.Title>
-          <Card.Text>
-            {isExpanded || item.content.length <= 130 ? item.content : `${item.content.substring(0, 130)}...`}
-            <br />
-            {item.content.length > 130 && (
-              <Button variant="link" onClick={toggleExpand}>
-                {isExpanded ? '접기' : '자세히 보기'}
-              </Button>
-            )}
-          </Card.Text>
+          <Button variant="primary" onClick={() => { navigate(`/detail/${item.id}`) }} className="mt-3">
+            자세히 보기</Button>
         </Card.Body>
       </Card>
     </Col>
