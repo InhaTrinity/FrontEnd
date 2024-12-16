@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Bookmarks({ darkMode }) {
   const [bookmarks, setBookmarks] = useState([]);
@@ -21,6 +22,26 @@ function Bookmarks({ darkMode }) {
       document.body.classList.remove('dark-mode');
     }
   }, [darkMode]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(process.env.REACT_APP_BACKEND_URL); // 백엔드 서버 주소
+        const backendData = response.data;
+        const savedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+        const updatedBookmarks = savedBookmarks.filter(bookmark => 
+          backendData.some(data => data.id === bookmark.id)
+        );
+        if (savedBookmarks.length !== updatedBookmarks.length) {
+          localStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
+          setBookmarks(updatedBookmarks);
+        }
+      } catch (error) {
+        console.error('백엔드 데이터를 가져오는 데 실패했습니다.', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   if (bookmarks.length === 0) {
     return (
