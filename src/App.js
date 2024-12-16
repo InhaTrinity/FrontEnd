@@ -72,6 +72,14 @@ function App() {
 
   const topics = [...new Set(newsdata.map(item => item.topic))]; // 중복되지 않는 주제 목록을 만듦
 
+  const debounce = (func, delay) => {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => func(...args), delay);
+    };
+  };
+
   const loadMore = () => {
     setItemsToShow(prev => prev + 10); // 보여줄 아이템 수를 10개씩 더 보여줌
   }
@@ -96,12 +104,12 @@ function App() {
     if (!newsdata.length || loading) return; // 뉴스 데이터가 없거나 로딩 중이면 실행하지 않음
 
     const observer = new IntersectionObserver( // 무한 스크롤을 위한 옵저버
-      (entries) => { // 엔트리가 보이면
+      debounce((entries) => { // 엔트리가 보이면
         if (entries[0].isIntersecting && !loading && searchedNewsData.length > itemsToShow) { // 로딩 중이 아니면
           loadMore(); // 더 많은 데이터를 로드
         }
-      },
-      { threshold: 1.0 }
+      }, 300),
+      { threshold: 0.8 }
     );
 
     const currentLoader = loader.current; // 로더를 변수에 저장
