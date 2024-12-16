@@ -59,11 +59,15 @@ function Detail({ newsdata, darkMode }) {
             const updatedBookmarks = bookmarks.filter(bookmark => bookmark.id !== item.id);
             localStorage.setItem('bookmarks', JSON.stringify(updatedBookmarks));
             setIsBookmarked(false);
+            setPopupMessage('북마크가 삭제되었습니다.');
         } else {
             bookmarks.push(item);
             localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
             setIsBookmarked(true);
+            setPopupMessage('북마크가 추가되었습니다.');
         }
+        setPopupAnimation('popup-show');
+        setTimeout(() => setPopupAnimation('popup-hide'), 2500);
     }
 
     if (!item) {
