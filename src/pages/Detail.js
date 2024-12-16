@@ -79,7 +79,7 @@ function Detail({ newsdata, darkMode }) {
             <div className={`popup ${popupAnimation}`}>{popupMessage}</div>
             <Card className="shadow-sm" style={{ width: '70%' }}>
                 <Card.Img variant="top" src={item.image} alt="no image"
-                    style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '0 auto' }} />
+                    style={{ width: 'auto', height: 'auto', objectFit: 'cover', margin: '0 auto' }} />
                 <Card.Body>
                     <Card.Title>{item.title}</Card.Title>
                     <Card.Text>
