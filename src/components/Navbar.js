@@ -11,6 +11,7 @@ function NavBar({ topics, handleTopicClick, handleMainClick }) {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="ms-auto">
+            <Nav.Link onClick={handleMainClick}>전체보기</Nav.Link>
             {topics.map((topic, index) => (
               <Nav.Link key={index} onClick={() => handleTopicClick(topic)}>{topic}</Nav.Link>
             ))}
