@@ -81,7 +81,6 @@ function App() {
       setLoading(true); // 데이터를 가져올 때 로딩 상태를 true로 변경
       try {
         const response = await axios.get(process.env.REACT_APP_BACKEND_URL); // 백엔드 서버 주소
-        console.log('성공', response.data); // 데이터를 가져오면 콘솔에 출력, 확인용 코드
         setNewsData(response.data); // 가져온 데이터를 newsdata에 저장
         setItemsToShow(10); // 데이터를 가져오면 보여줄 아이템 수를 초기화
       }
@@ -98,29 +97,39 @@ function App() {
 
     const observer = new IntersectionObserver( // 무한 스크롤을 위한 옵저버
       (entries) => { // 엔트리가 보이면
-        if (entries[0].isIntersecting && !loading) { // 로딩 중이 아니면
+        if (entries[0].isIntersecting && !loading && searchedNewsData.length > itemsToShow) { // 로딩 중이 아니면
           loadMore(); // 더 많은 데이터를 로드
         }
       },
       { threshold: 1.0 }
     );
 
-    if (loader.current) { // 로더가 있으면
-      observer.observe(loader.current); // 로더를 관찰
+    const currentLoader = loader.current; // 로더를 변수에 저장
+
+    if (currentLoader) { // 로더가 있으면
+      observer.observe(currentLoader); // 로더를 관찰
     }
 
     return () => { // 컴포넌트가 언마운트되면 로더 관찰을 중지
-      if (loader.current) { // 로더가 있으면
-        observer.unobserve(loader.current); // 로더 관찰을 중지
+      if (currentLoader) { // 로더가 있으면
+        observer.unobserve(currentLoader); // 로더 관찰을 중지
       }
     };
-  }, [loader, itemsToShow, newsdata, loading]); // 로더, 보여줄 아이템 수, 뉴스 데이터, 로딩 상태가 변경될 때마다 실행
+  }, [loader, itemsToShow, newsdata, loading, searchedNewsData.length, location.pathname]); // 로더, 보여줄 아이템 수, 뉴스 데이터, 로딩 상태, 경로가 변경될 때마다 실행
 
   useEffect(() => {
     if (loading) { // 로딩 중이면
       setLoading(false); // 로딩 상태를 false로 변경
     }
   }, [searchedNewsData]); // 검색된 뉴스 데이터가 변경될 때마다 실행
+
+  useEffect(() => {
+    setItemsToShow(10); // 주제가 변경되면 보여줄 아이템 수를 초기화
+  }, [selectedTopic]); // 선택된 주제가 변경될 때마다 실행
+
+  useEffect(() => {
+    setItemsToShow(10); // 경로가 변경될 때마다 보여줄 아이템 수를 초기화
+  }, [location.pathname]);
 
   return (
     <div className={`App ${darkMode ? 'dark-mode' : ''}`}>
