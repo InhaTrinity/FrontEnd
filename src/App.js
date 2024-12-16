@@ -173,6 +173,22 @@ function App() {
           } />
           <Route path="/detail/:id" element={<Detail newsdata={newsdata} darkMode={darkMode} />} />
           <Route path="/bookmarks" element={<Bookmark darkMode={darkMode} />} />
+          <Route path="/topic/:topicName" element={
+            <div>
+              <Container>
+                <Row xs={1} md={2} className="g-4">
+                  {searchedNewsData.length > 0 ? (
+                    searchedNewsData.map((item, index) => (
+                      <NewsCard key={index} item={item} openStates={openStates} handleToggle={handleToggle} />
+                    ))
+                  ) : (
+                    <div className="text-center w-100">선택한 주제의 뉴스가 없습니다</div>
+                  )}
+                </Row>
+                <div ref={loader} />
+              </Container>
+            </div>
+          } />
           <Route path="*" element={<div>Not Found</div>} />
         </Routes>
       )}
