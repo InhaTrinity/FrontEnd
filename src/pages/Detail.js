@@ -78,8 +78,16 @@ function Detail({ newsdata, darkMode }) {
         <div className="d-flex justify-content-around">
             <div className={`popup ${popupAnimation}`}>{popupMessage}</div>
             <Card className="shadow-sm" style={{ width: '70%' }}>
-                <Card.Img variant="top" src={item.image} alt="no image"
-                    style={{ width: 'auto', height: 'auto', objectFit: 'cover', margin: '0 auto' }} />
+                <Card.Img
+                    variant="top"
+                    src={item.image}
+                    style={{
+                        width: '100%',
+                        height: 'auto',
+                        maxHeight: '200px',
+                        objectFit: 'contain'
+                    }}
+                />
                 <Card.Body>
                     <Card.Title>{item.title}</Card.Title>
                     <Card.Text>
