@@ -102,7 +102,7 @@ function App() {
           console.log('로드 중...'); // 확인용 코드
         }
       },
-      {rootMargin: '0px 0px 400px 0px', threshold: 0.1} // threshold 값을 0.5로 조정하여 모바일 환경에서 더 잘 작동하도록 함
+      {rootMargin: '0px 0px 200px 0px', threshold: 0.5} // threshold 값을 0.5로 조정하여 모바일 환경에서 더 잘 작동하도록 함
     );
 
     const currentLoader = loader.current; // 로더를 변수에 저장
