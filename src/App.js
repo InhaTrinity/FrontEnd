@@ -1,30 +1,21 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
-import { Container, Row, Spinner } from 'react-bootstrap';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { Navbar, Container, Nav, Row, Col } from 'react-bootstrap';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
+import Collapse from 'react-bootstrap/Collapse';
+import Card from 'react-bootstrap/Card';
+import Pagination from 'react-bootstrap/Pagination';
+import data from './pages/data.js';
 import Detail from './pages/Detail.js';
-import NavBar from './components/Navbar.js';
-import NewsCard from './components/NewsCard.js';
-import SearchBar from './components/Searchbar.js';
-import Bookmark from './pages/Bookmarks.js';
+import axios from 'axios';
 
 function App() {
-  let [newsdata, setNewsData] = useState([]); // 뉴스 데이터
-  let [selectedTopic, setSelectedTopic] = useState(null); // 선택된 주제
-  let [openStates, setOpenStates] = useState({}); // 각 아이템의 펼침 상태
-  let [searchQuery, setSearchQuery] = useState(''); // 검색어
-  let [searchInput, setSearchInput] = useState(''); // 검색어 입력
-  let [itemsToShow, setItemsToShow] = useState(10); // 보여줄 아이템 수, 초기값은 10
-  let [loading, setLoading] = useState(false); // 로딩 상태
-  let [darkMode, setDarkMode] = useState(() => {
-    const saveDarkMode = localStorage.getItem('darkMode'); // 로컬 스토리지에서 다크 모드 상태를 가져옴
-    return saveDarkMode ? JSON.parse(saveDarkMode) : false; // 다크 모드 상태가 있으면 가져오고, 없으면 false로 설정
-  }); // 다크 모드
-
-  let navigate = useNavigate(); // 라우터 네비게이션을 위한 변수
-  const loader = useRef(null); // 무한 스크롤을 위한 로더
-  const location = useLocation(); // 현재 경로를 가져오기 위한 변수
+  let [newsdata, setNewsData] = useState(data);
+  let [selectedTopic, setSelectedTopic] = useState(null);
+  let [currentPage, setCurrentPage] = useState(1);
+  let [openStates, setOpenStates] = useState({});
+  let navigate = useNavigate();
 
   const handleTopicClick = (topic) => {
     setSelectedTopic(topic); // 주제를 선택하면 해당 주제의 뉴스만 보여줌
@@ -77,60 +68,18 @@ function App() {
   }
 
   useEffect(() => {
-    const fetchData = async () => { // 백엔드에서 데이터를 가져옴
-      setLoading(true); // 데이터를 가져올 때 로딩 상태를 true로 변경
+    const fetchData = async () => {
       try {
-        const response = await axios.get(process.env.REACT_APP_BACKEND_URL); // 백엔드 서버 주소
-        setNewsData(response.data); // 가져온 데이터를 newsdata에 저장
-        setItemsToShow(10); // 데이터를 가져오면 보여줄 아이템 수를 초기화
+        const response = await axios.get('http://springboot-developer-env.eba-zqkfw5p2.ap-northeast-2.elasticbeanstalk.com/');
+        console.log('성공', response.data);
+        setNewsData(response.data);
       }
       catch (error) {
-        console.error('실패', error); // 데이터를 가져오지 못하면 콘솔에 출력, 확인용 코드
+        console.error('실패', error);
       }
-      setLoading(false); // 데이터를 가져오면 로딩 상태를 false로 변경
     };
-    fetchData(); // 데이터를 가져오는 함수를 실행
+    fetchData();
   }, []);
-
-  useEffect(() => {
-    if (!newsdata.length || loading) return; // 뉴스 데이터가 없거나 로딩 중이면 실행하지 않음
-
-    const observer = new IntersectionObserver( // 무한 스크롤을 위한 옵저버
-      (entries) => { // 엔트리가 보이면
-        if (entries[0].isIntersecting && !loading && searchedNewsData.length > itemsToShow) { // 로딩 중이 아니면
-          loadMore(); // 더 많은 데이터를 로드
-          console.log('로드 중...'); // 확인용 코드
-        }
-      },
-      {rootMargin: '0px 0px 200px 0px', threshold: 0.5} // threshold 값을 0.5로 조정하여 모바일 환경에서 더 잘 작동하도록 함
-    );
-
-    const currentLoader = loader.current; // 로더를 변수에 저장
-
-    if (currentLoader) { // 로더가 있으면
-      observer.observe(currentLoader); // 로더를 관찰
-    }
-
-    return () => { // 컴포넌트가 언마운트되면 로더 관찰을 중지
-      if (currentLoader) { // 로더가 있으면
-        observer.unobserve(currentLoader); // 로더 관찰을 중지
-      }
-    };
-  }, [loader, itemsToShow, newsdata, loading, searchedNewsData.length, location.pathname]); // 로더, 보여줄 아이템 수, 뉴스 데이터, 로딩 상태, 경로가 변경될 때마다 실행
-
-  useEffect(() => {
-    if (loading) { // 로딩 중이면
-      setLoading(false); // 로딩 상태를 false로 변경
-    }
-  }, [searchedNewsData]); // 검색된 뉴스 데이터가 변경될 때마다 실행
-
-  useEffect(() => {
-    setItemsToShow(10); // 주제가 변경되면 보여줄 아이템 수를 초기화
-  }, [selectedTopic]); // 선택된 주제가 변경될 때마다 실행
-
-  useEffect(() => {
-    setItemsToShow(10); // 경로가 변경될 때마다 보여줄 아이템 수를 초기화
-  }, [location.pathname]);
 
   return (
     <div className={`App ${darkMode ? 'dark-mode' : ''}`}>
